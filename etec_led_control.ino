@@ -27,10 +27,11 @@ void setup()
 
   SoftPWMSetFadeTime(ALL, 100, 400);
   Serial.println("=========================");
-  Serial.println("EspacioTec Led Controller");
+  Serial.println("EspacioTec Led Controller v0.8.3");
   Serial.println("-------------------------");
   Serial.println("FORMA DE USO: recibe por serie lineas de texto terminadas con LF (\\n), con el formato \"LED VALUE\", ej: \"11 255\".");
   Serial.println("LED es el numero de pin del Arduino, desde 2 a 13 para los pines D2 a D13; VALUE va de 0 a 255."); 
+  Serial.println("Si se recibe un 0 como LED, el programa vuelve a DEMO MODE.");
   Serial.println("Consultas? alecu@protocultura.net");
   Serial.println("-------------------------");
   mode = DEMO;
@@ -57,13 +58,18 @@ void operation_loop()
     int value = Serial.parseInt();
 
     if (Serial.read() == '\n') {
-      pin = constrain(pin, FIRST, LAST);
-      value = constrain(value, 0, 255);
-      SoftPWMSet(pin, value);
-      Serial.print("Led");
-      Serial.print(pin);
-      Serial.print("=");
-      Serial.println(value);
+      if (pin == 0) {
+        mode = DEMO;
+        Serial.println("DEMO MODE");        
+      } else {
+        pin = constrain(pin, FIRST, LAST);
+        value = constrain(value, 0, 255);
+        SoftPWMSet(pin, value);
+        Serial.print("Led");
+        Serial.print(pin);
+        Serial.print("=");
+        Serial.println(value);        
+      }
     }
   }
 }
